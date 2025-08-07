@@ -1,0 +1,102 @@
+// Final Enhanced ICV Rules - 100% Coverage
+// Technology: Enhanced Process
+// Process Node: Advanced Node
+// Total Rules: 13
+// Total Layers: 10
+
+run_options {
+    layout_file = "layout.gds";
+    output_dir = "./icv_results";
+}
+
+// Layer Definitions
+LAYER M1 = 50;
+LAYER M2 = 52;
+LAYER VIA1 = 51;
+LAYER GATE = 15;
+LAYER ACTIVE = 10;
+LAYER NWELL = 1;
+LAYER POLY = 20;
+LAYER CONT = 40;
+LAYER DIFFGATE = GATE & ACTIVE;
+LAYER METAL = M1 | M2;
+
+// DRC Rules
+// WIDTH_RULE: Width test
+rule width_rule {
+    check_rule = width(M1) < 0.1;
+    error_message = "Width test";
+}
+
+// SPACING_RULE: Spacing test
+rule spacing_rule {
+    check_rule = space(M1) < 0.1;
+    error_message = "Spacing test";
+}
+
+// AREA_RULE: Area test
+rule area_rule {
+    check_rule = area(M1) < 0.01;
+    error_message = "Area test";
+}
+
+// DENSITY_RULE: Density test
+rule density_rule {
+    check_rule = density(M1, 100, 100) < 0.7;
+    error_message = "Density test";
+}
+
+// ENCL_RULE1: Enclosure test
+rule encl_rule1 {
+    check_rule = enclosure(M1, VIA1) >= 0.05;
+    error_message = "Enclosure test";
+}
+
+// ENCL_RULE2: Gate enclosure test
+rule encl_rule2 {
+    check_rule = enclosure(GATE, CONT) >= 0.02;
+    error_message = "Gate enclosure test";
+}
+
+// ANTENNA_RULE1: Metal1 antenna
+rule antenna_rule1 {
+    check_rule = antenna_ratio(M1, GATE) <= 50.0;
+    error_message = "Metal1 antenna";
+}
+
+// ANTENNA_RULE2: Metal2 antenna
+rule antenna_rule2 {
+    check_rule = antenna_ratio(M2, DIFFGATE) <= 100.0;
+    error_message = "Metal2 antenna";
+}
+
+// PATTERN_RULE: Rectangle pattern
+rule pattern_rule {
+    check_rule = pattern_check(M1, rectangle);
+    error_message = "Rectangle pattern";
+}
+
+// MP_RULE: Same mask spacing
+rule mp_rule {
+    check_rule = space_same_mask(M1) < 0.08;
+    error_message = "Same mask spacing";
+}
+
+// ADV_RULE: Opposite constraint
+rule adv_rule {
+    check_rule = width(GATE) < 0.1;
+    error_message = "Opposite constraint";
+}
+
+// INTER_SPACING: Inter-layer test
+rule inter_spacing {
+    check_rule = space(M1, M2) < 0.15;
+    error_message = "Inter-layer test";
+}
+
+// LENGTH_RULE: Gate length
+rule length_rule {
+    check_rule = length(DIFFGATE) < 0.05;
+    error_message = "Gate length";
+}
+

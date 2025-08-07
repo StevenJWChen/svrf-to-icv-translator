@@ -1,0 +1,78 @@
+// Test SVRF for 100% coverage validation
+LAYOUT SYSTEM GDSII
+
+// Layers
+LAYER M1 50
+LAYER M2 52
+LAYER VIA1 51
+LAYER GATE 15
+LAYER ACTIVE 10
+LAYER NWELL 1
+LAYER POLY 20
+LAYER CONT 40
+
+// Derived layers
+DIFFGATE = GATE AND ACTIVE
+METAL = M1 OR M2
+
+// Standard rules
+WIDTH_RULE { @ "Width test"
+    INTERNAL1 M1 < 0.1
+}
+
+SPACING_RULE { @ "Spacing test"
+    EXTERNAL1 M1 < 0.1
+}
+
+AREA_RULE { @ "Area test"
+    AREA M1 < 0.01
+}
+
+DENSITY_RULE { @ "Density test"
+    DENSITY M1 WINDOW 100 100 < 0.7
+}
+
+// Enhanced rules - Enclosure
+ENCL_RULE1 { @ "Enclosure test"
+    VIA1 NOT INSIDE M1 BY >= 0.05
+}
+
+ENCL_RULE2 { @ "Gate enclosure test"  
+    CONT NOT INSIDE GATE BY >= 0.02
+}
+
+// Antenna rules
+ANTENNA_RULE1 { @ "Metal1 antenna"
+    ANTENNA M1 GATE MAX RATIO 50
+}
+
+ANTENNA_RULE2 { @ "Metal2 antenna"
+    ANTENNA M2 DIFFGATE MAX RATIO 100
+}
+
+// Pattern matching
+PATTERN_RULE { @ "Rectangle pattern"
+    INTERNAL1 M1 > 20.0
+    RECTANGLE M1 LENGTH > 20.0 WIDTH > 2.0
+}
+
+// Multi-patterning
+MP_RULE { @ "Same mask spacing"
+    EXTERNAL1 M1 < 0.08 SAME_MASK
+}
+
+// Advanced constraints
+ADV_RULE { @ "Opposite constraint"
+    INTERNAL1 GATE < 0.1
+    INTERNAL1 GATE > 0.09 OPPOSITE
+}
+
+// Inter-layer spacing
+INTER_SPACING { @ "Inter-layer test"
+    EXTERNAL M1 M2 < 0.15
+}
+
+// Length rule
+LENGTH_RULE { @ "Gate length"
+    INTERNAL2 DIFFGATE < 0.05
+}

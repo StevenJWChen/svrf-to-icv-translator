@@ -1,0 +1,410 @@
+// Complex SVRF DRC Rules - Based on Advanced Technology Node
+// Derived from various foundry rule patterns and academic sources
+// Technology: Advanced FinFET 7nm-class process
+
+LAYOUT SYSTEM GDSII
+LAYOUT PATH "/design/layout.gds"
+LAYOUT PRIMARY "*"
+LAYOUT CASE PRESERVE
+
+// Include files  
+INCLUDE "layer_mapping.svrf"
+INCLUDE "derived_layers.svrf"
+INCLUDE "connectivity.svrf"
+
+// Primary layer definitions - Advanced process layers
+LAYER NWELL 1
+LAYER PWELL 2
+LAYER DNW 3
+LAYER ACTIVE 10
+LAYER GATE 15
+LAYER POLY 20
+LAYER NPLUS 25
+LAYER PPLUS 26
+LAYER PIMP 27
+LAYER NIMP 28
+LAYER HVTIMP 29
+LAYER LVTIMP 30
+LAYER SAB 35
+LAYER CONT 40
+LAYER M1 50
+LAYER V1 51
+LAYER M2 52
+LAYER V2 53
+LAYER M3 54
+LAYER V3 55
+LAYER M4 56
+LAYER V4 57
+LAYER M5 58
+LAYER V5 59
+LAYER M6 60
+LAYER V6 61
+LAYER M7 62
+LAYER V7 63
+LAYER M8 64
+LAYER V8 65
+LAYER M9 66
+LAYER V9 67
+LAYER M10 68
+LAYER AP 70
+LAYER BJTDUMMY 80
+LAYER VARACTOR 85
+LAYER IND 90
+LAYER CAP 95
+LAYER RES 100
+LAYER DIODE 105
+LAYER ESD 110
+LAYER PAD 115
+LAYER SEAL 120
+LAYER TEXT 125
+LAYER PRBOUND 130
+LAYER FRAME 135
+
+// Derived layers - Complex boolean operations
+NACT = ACTIVE AND NIMP
+PACT = ACTIVE AND PIMP
+NGATE = GATE AND NIMP
+PGATE = GATE AND PIMP
+HVTGATE = GATE AND HVTIMP
+LVTGATE = GATE AND LVTIMP
+DIFFGATE = GATE AND ACTIVE
+POLYGATE = GATE NOT ACTIVE
+CAPMETAL = CAP AND (M1 OR M2 OR M3 OR M4 OR M5)
+RESMETAL = RES AND (M1 OR M2 OR M3 OR M4 OR M5)
+ALLMETAL = M1 OR M2 OR M3 OR M4 OR M5 OR M6 OR M7 OR M8 OR M9 OR M10
+ALLVIA = V1 OR V2 OR V3 OR V4 OR V5 OR V6 OR V7 OR V8 OR V9
+LOWERMET = M1 OR M2 OR M3 OR M4 OR M5
+UPPERMET = M6 OR M7 OR M8 OR M9 OR M10
+COREAREA = PRBOUND NOT PAD
+
+// Well rules - Advanced isolation
+NWELL_WIDTH { @ "N-Well minimum width"
+    INTERNAL1 NWELL < 0.2
+}
+
+NWELL_SPACE { @ "N-Well minimum spacing"
+    EXTERNAL1 NWELL < 0.46
+}
+
+NWELL_PWELL_SPACE { @ "N-Well to P-Well spacing"
+    EXTERNAL NWELL PWELL < 0.0
+}
+
+DNW_WIDTH { @ "Deep N-Well minimum width"
+    INTERNAL1 DNW < 3.0
+}
+
+DNW_SPACE { @ "Deep N-Well minimum spacing"
+    EXTERNAL1 DNW < 6.0
+}
+
+DNW_NWELL_ENCL { @ "Deep N-Well must enclose N-Well"
+    NWELL NOT INSIDE DNW BY >= 1.5
+}
+
+// Active area rules - FinFET specific
+ACTIVE_WIDTH { @ "Active area minimum width"
+    INTERNAL1 ACTIVE < 0.05
+}
+
+ACTIVE_SPACE { @ "Active area minimum spacing"
+    EXTERNAL1 ACTIVE < 0.08
+}
+
+ACTIVE_NWELL_ENCL { @ "N+ Active must be enclosed by N-Well"
+    NACT NOT INSIDE NWELL BY >= 0.05
+}
+
+ACTIVE_PWELL_ENCL { @ "P+ Active must be enclosed by P-Well"  
+    PACT NOT INSIDE PWELL BY >= 0.05
+}
+
+ACTIVE_AREA_MIN { @ "Active area minimum size"
+    AREA ACTIVE < 0.0025
+}
+
+ACTIVE_DENSITY { @ "Active area density check"
+    DENSITY ACTIVE WINDOW 50 50 < 0.2
+}
+
+// Gate/Poly rules - Advanced lithography constraints
+GATE_WIDTH { @ "Gate minimum width"
+    INTERNAL1 GATE < 0.05
+}
+
+GATE_LENGTH { @ "Gate minimum length"
+    INTERNAL2 DIFFGATE < 0.04
+}
+
+GATE_SPACE { @ "Gate minimum spacing"
+    EXTERNAL1 GATE < 0.08
+}
+
+GATE_ACTIVE_OVERHANG { @ "Gate must overhang active"
+    ACTIVE NOT INSIDE GATE BY >= 0.02
+}
+
+POLY_WIDTH { @ "Poly minimum width" 
+    INTERNAL1 POLYGATE < 0.05
+}
+
+POLY_SPACE { @ "Poly minimum spacing"
+    EXTERNAL1 POLYGATE < 0.08
+}
+
+POLY_ACTIVE_SPACE { @ "Poly to Active spacing"
+    EXTERNAL POLYGATE ACTIVE < 0.04
+}
+
+// Implant rules - Multiple threshold voltages
+NPLUS_WIDTH { @ "N+ implant minimum width"
+    INTERNAL1 NPLUS < 0.1
+}
+
+NPLUS_ENCL_NACT { @ "N+ must enclose N+ Active"
+    NACT NOT INSIDE NPLUS BY >= 0.03
+}
+
+PPLUS_WIDTH { @ "P+ implant minimum width"
+    INTERNAL1 PPLUS < 0.1  
+}
+
+PPLUS_ENCL_PACT { @ "P+ must enclose P+ Active"
+    PACT NOT INSIDE PPLUS BY >= 0.03
+}
+
+HVTIMP_WIDTH { @ "HVT implant minimum width"
+    INTERNAL1 HVTIMP < 0.1
+}
+
+LVTIMP_WIDTH { @ "LVT implant minimum width"
+    INTERNAL1 LVTIMP < 0.1
+}
+
+HVTIMP_LVTIMP_SPACE { @ "HVT to LVT implant spacing"
+    EXTERNAL HVTIMP LVTIMP < 0.1
+}
+
+// Contact rules - Aggressive scaling
+CONT_SIZE { @ "Contact minimum size"
+    INTERNAL1 CONT < 0.026
+}
+
+CONT_SPACE { @ "Contact minimum spacing"
+    EXTERNAL1 CONT < 0.03
+}
+
+CONT_ACTIVE_ENCL { @ "Active must enclose Contact"
+    CONT NOT INSIDE ACTIVE BY >= 0.005
+}
+
+CONT_GATE_ENCL { @ "Gate must enclose Contact"
+    CONT NOT INSIDE GATE BY >= 0.01
+}
+
+CONT_GATE_SPACE { @ "Contact to Gate spacing"
+    EXTERNAL CONT GATE < 0.04
+}
+
+// Metal layer rules - Multiple metal stacks
+M1_WIDTH { @ "Metal1 minimum width"
+    INTERNAL1 M1 < 0.032
+}
+
+M1_SPACE { @ "Metal1 minimum spacing"
+    EXTERNAL1 M1 < 0.032
+}
+
+M1_AREA_MIN { @ "Metal1 minimum area"
+    AREA M1 < 0.001024
+}
+
+M1_CONT_ENCL { @ "Metal1 must enclose Contact"
+    CONT NOT INSIDE M1 BY >= 0.005
+}
+
+M2_WIDTH { @ "Metal2 minimum width"
+    INTERNAL1 M2 < 0.04
+}
+
+M2_SPACE { @ "Metal2 minimum spacing"
+    EXTERNAL1 M2 < 0.04
+}
+
+M2_V1_ENCL { @ "Metal2 must enclose Via1"
+    V1 NOT INSIDE M2 BY >= 0.005
+}
+
+// Via rules - Stacked via constraints
+V1_SIZE { @ "Via1 minimum size"
+    INTERNAL1 V1 < 0.026
+}
+
+V1_SPACE { @ "Via1 minimum spacing"
+    EXTERNAL1 V1 < 0.03
+}
+
+V1_M1_ENCL { @ "Metal1 must enclose Via1"
+    V1 NOT INSIDE M1 BY >= 0.005
+}
+
+V2_SIZE { @ "Via2 minimum size"
+    INTERNAL1 V2 < 0.028
+}
+
+V2_SPACE { @ "Via2 minimum spacing"
+    EXTERNAL1 V2 < 0.032
+}
+
+// High metal layer rules - Thick metal
+M8_WIDTH { @ "Metal8 minimum width"
+    INTERNAL1 M8 < 0.2
+}
+
+M8_SPACE { @ "Metal8 minimum spacing"
+    EXTERNAL1 M8 < 0.2
+}
+
+M9_WIDTH { @ "Metal9 minimum width"
+    INTERNAL1 M9 < 0.4
+}
+
+M9_SPACE { @ "Metal9 minimum spacing"
+    EXTERNAL1 M9 < 0.4
+}
+
+M10_WIDTH { @ "Metal10 minimum width"
+    INTERNAL1 M10 < 0.8
+}
+
+M10_SPACE { @ "Metal10 minimum spacing"
+    EXTERNAL1 M10 < 0.8
+}
+
+// Density rules - Advanced fill requirements
+M1_DENSITY { @ "Metal1 density constraints"
+    DENSITY M1 WINDOW 100 100 < 0.2
+}
+
+M2_DENSITY { @ "Metal2 density constraints"
+    DENSITY M2 WINDOW 100 100 < 0.2
+    DENSITY M2 WINDOW 100 100 > 0.7
+}
+
+ALLMETAL_DENSITY { @ "Total metal density"
+    DENSITY ALLMETAL WINDOW 200 200 > 0.6
+}
+
+// Capacitor rules
+CAP_WIDTH { @ "Capacitor minimum width"
+    INTERNAL1 CAP < 0.1
+}
+
+CAP_SPACE { @ "Capacitor minimum spacing"
+    EXTERNAL1 CAP < 0.15
+}
+
+CAPMETAL_AREA { @ "Capacitor metal minimum area"
+    AREA CAPMETAL < 0.01
+}
+
+// Resistor rules
+RES_WIDTH { @ "Resistor minimum width"
+    INTERNAL1 RES < 0.1
+}
+
+RES_LENGTH { @ "Resistor minimum length"
+    INTERNAL2 RES < 0.5
+}
+
+RESMETAL_CONT_ENCL { @ "Resistor metal must enclose contacts"
+    CONT NOT INSIDE RESMETAL BY >= 0.05
+}
+
+// ESD rules
+ESD_WIDTH { @ "ESD device minimum width"
+    INTERNAL1 ESD < 2.0
+}
+
+ESD_PAD_SPACE { @ "ESD to PAD spacing"
+    EXTERNAL ESD PAD < 5.0
+}
+
+// Antenna rules - Advanced process specific
+M1_ANTENNA_RATIO { @ "Metal1 antenna ratio"
+    ANTENNA M1 GATE MAX RATIO 50
+}
+
+M2_ANTENNA_RATIO { @ "Metal2 antenna ratio" 
+    ANTENNA M2 GATE MAX RATIO 100
+}
+
+UPPER_METAL_ANTENNA { @ "Upper metal antenna check"
+    ANTENNA UPPERMET GATE MAX RATIO 500
+}
+
+// Special device rules
+VARACTOR_SIZE { @ "Varactor minimum size"
+    INTERNAL1 VARACTOR < 1.0
+}
+
+VARACTOR_SPACE { @ "Varactor minimum spacing"
+    EXTERNAL1 VARACTOR < 2.0
+}
+
+IND_WIDTH { @ "Inductor minimum width"
+    INTERNAL1 IND < 2.0
+}
+
+IND_SPACE { @ "Inductor minimum spacing"
+    EXTERNAL1 IND < 5.0
+}
+
+// Seal ring rules
+SEAL_WIDTH { @ "Seal ring minimum width"
+    INTERNAL1 SEAL < 10.0
+}
+
+SEAL_CORE_SPACE { @ "Seal ring to core spacing"
+    EXTERNAL SEAL COREAREA < 10.0
+}
+
+// Text and dummy rules
+TEXT_SIZE { @ "Text minimum size"
+    INTERNAL1 TEXT < 1.0
+}
+
+BJTDUMMY_SIZE { @ "BJT dummy minimum size"
+    INTERNAL1 BJTDUMMY < 0.5
+}
+
+// Frame and boundary rules
+FRAME_WIDTH { @ "Frame minimum width"
+    INTERNAL1 FRAME < 5.0
+}
+
+PRBOUND_ENCL_CORE { @ "PR boundary must enclose all core layers"
+    ALLMETAL NOT INSIDE PRBOUND BY >= 2.0
+}
+
+// Advanced pattern matching rules
+GATE_PITCH_CHECK { @ "Gate pitch regularity check"
+    INTERNAL1 GATE < 0.096
+    INTERNAL1 GATE > 0.104 OPPOSITE
+}
+
+METAL_SLOT_CHECK { @ "Metal slotting requirement"
+    INTERNAL1 M1 > 20.0
+    RECTANGLE M1 LENGTH > 20.0 WIDTH > 2.0
+}
+
+// Multi-patterning rules
+M1_COLOR_SPACE { @ "Metal1 same color spacing"
+    EXTERNAL1 M1 < 0.064 SAME_MASK
+}
+
+M2_COLOR_SPACE { @ "Metal2 same color spacing"  
+    EXTERNAL1 M2 < 0.08 SAME_MASK
+}
+
+// End of rule deck

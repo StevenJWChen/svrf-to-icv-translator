@@ -1,0 +1,155 @@
+// Example SVRF DRC Rules for 180nm Process
+// Based on typical foundry design rules
+
+// Include files
+INCLUDE "layers.svrf"
+INCLUDE "derived_layers.svrf"
+
+// Layout system
+LAYOUT SYSTEM GDSII
+
+// Primary layer definitions
+LAYER M1 100
+LAYER M2 200  
+LAYER M3 300
+LAYER VIA1 400
+LAYER VIA2 500
+LAYER POLY 600
+LAYER ACTIVE 700
+LAYER NWELL 800
+LAYER CONTACT 900
+
+// Derived layers
+NMOS_GATE = POLY AND ACTIVE
+PMOS_GATE = POLY AND ACTIVE AND NWELL
+ALL_METAL = M1 OR M2 OR M3
+ALL_VIA = VIA1 OR VIA2
+
+// DRC Rules
+
+// M1 Rules
+M1_WIDTH { @ "M1 minimum width violation"
+    INTERNAL1 M1 < 0.25
+}
+
+M1_SPACE { @ "M1 minimum spacing violation" 
+    EXTERNAL1 M1 < 0.25
+}
+
+M1_AREA { @ "M1 minimum area violation"
+    AREA M1 < 0.1
+}
+
+// M2 Rules  
+M2_WIDTH { @ "M2 minimum width violation"
+    INTERNAL1 M2 < 0.3
+}
+
+M2_SPACE { @ "M2 minimum spacing violation"
+    EXTERNAL1 M2 < 0.3  
+}
+
+// M3 Rules
+M3_WIDTH { @ "M3 minimum width violation"
+    INTERNAL1 M3 < 0.4
+}
+
+M3_SPACE { @ "M3 minimum spacing violation"
+    EXTERNAL1 M3 < 0.4
+}
+
+// VIA Rules
+VIA1_SIZE { @ "VIA1 minimum size violation"
+    INTERNAL1 VIA1 < 0.2
+}
+
+VIA1_SPACE { @ "VIA1 minimum spacing violation"
+    EXTERNAL1 VIA1 < 0.25
+}
+
+VIA1_ENCLOSED_M1 { @ "VIA1 not properly enclosed by M1"
+    VIA1 NOT INSIDE M1 BY == 0.05
+}
+
+VIA1_ENCLOSED_M2 { @ "VIA1 not properly enclosed by M2"
+    VIA1 NOT INSIDE M2 BY == 0.05  
+}
+
+// VIA2 Rules
+VIA2_SIZE { @ "VIA2 minimum size violation"
+    INTERNAL1 VIA2 < 0.25
+}
+
+VIA2_ENCLOSED_M2 { @ "VIA2 not properly enclosed by M2"
+    VIA2 NOT INSIDE M2 BY == 0.1
+}
+
+VIA2_ENCLOSED_M3 { @ "VIA2 not properly enclosed by M3"
+    VIA2 NOT INSIDE M3 BY == 0.1
+}
+
+// Poly Rules
+POLY_WIDTH { @ "POLY minimum width violation"
+    INTERNAL1 POLY < 0.15
+}
+
+POLY_SPACE { @ "POLY minimum spacing violation"
+    EXTERNAL1 POLY < 0.2
+}
+
+POLY_GATE_LENGTH { @ "POLY gate length violation"
+    INTERNAL2 NMOS_GATE < 0.18 SINGULAR
+    INTERNAL2 PMOS_GATE < 0.18 SINGULAR
+}
+
+// Active area rules
+ACTIVE_WIDTH { @ "ACTIVE minimum width violation"
+    INTERNAL1 ACTIVE < 0.2
+}
+
+ACTIVE_SPACE { @ "ACTIVE minimum spacing violation"
+    EXTERNAL1 ACTIVE < 0.25
+}
+
+// Contact rules
+CONTACT_SIZE { @ "CONTACT minimum size violation"
+    INTERNAL1 CONTACT < 0.15
+}
+
+CONTACT_SPACE { @ "CONTACT minimum spacing violation"  
+    EXTERNAL1 CONTACT < 0.2
+}
+
+CONTACT_ENCLOSED_ACTIVE { @ "CONTACT not properly enclosed by ACTIVE"
+    CONTACT NOT INSIDE ACTIVE BY == 0.05
+}
+
+CONTACT_ENCLOSED_POLY { @ "CONTACT not properly enclosed by POLY"
+    CONTACT NOT INSIDE POLY BY == 0.05
+}
+
+// Well rules
+NWELL_WIDTH { @ "NWELL minimum width violation"
+    INTERNAL1 NWELL < 1.0
+}
+
+NWELL_SPACE { @ "NWELL minimum spacing violation"
+    EXTERNAL1 NWELL < 1.2
+}
+
+// Cross-layer rules
+POLY_ACTIVE_SPACE { @ "POLY to ACTIVE spacing violation"
+    EXTERNAL POLY ACTIVE < 0.1
+}
+
+M1_POLY_SPACE { @ "M1 to POLY spacing violation"
+    EXTERNAL M1 POLY < 0.15
+}
+
+// Density rules
+M1_DENSITY { @ "M1 density violation"
+    DENSITY M1 WINDOW 100 100 > 0.7
+    DENSITY M1 WINDOW 100 100 < 0.3
+}
+
+// End of rules

@@ -1,0 +1,537 @@
+// Final Enhanced ICV Rules - 100% Coverage
+// Technology: Enhanced Process
+// Process Node: Advanced Node
+// Total Rules: 77
+// Total Layers: 61
+
+run_options {
+    layout_file = "layout.gds";
+    output_dir = "./icv_results";
+}
+
+// Layer Definitions
+LAYER NWELL = 1;
+LAYER PWELL = 2;
+LAYER DNW = 3;
+LAYER ACTIVE = 10;
+LAYER GATE = 15;
+LAYER POLY = 20;
+LAYER NPLUS = 25;
+LAYER PPLUS = 26;
+LAYER PIMP = 27;
+LAYER NIMP = 28;
+LAYER HVTIMP = 29;
+LAYER LVTIMP = 30;
+LAYER SAB = 35;
+LAYER CONT = 40;
+LAYER M1 = 50;
+LAYER V1 = 51;
+LAYER M2 = 52;
+LAYER V2 = 53;
+LAYER M3 = 54;
+LAYER V3 = 55;
+LAYER M4 = 56;
+LAYER V4 = 57;
+LAYER M5 = 58;
+LAYER V5 = 59;
+LAYER M6 = 60;
+LAYER V6 = 61;
+LAYER M7 = 62;
+LAYER V7 = 63;
+LAYER M8 = 64;
+LAYER V8 = 65;
+LAYER M9 = 66;
+LAYER V9 = 67;
+LAYER M10 = 68;
+LAYER AP = 70;
+LAYER BJTDUMMY = 80;
+LAYER VARACTOR = 85;
+LAYER IND = 90;
+LAYER CAP = 95;
+LAYER RES = 100;
+LAYER DIODE = 105;
+LAYER ESD = 110;
+LAYER PAD = 115;
+LAYER SEAL = 120;
+LAYER TEXT = 125;
+LAYER PRBOUND = 130;
+LAYER FRAME = 135;
+LAYER NACT = ACTIVE & NIMP;
+LAYER PACT = ACTIVE & PIMP;
+LAYER NGATE = GATE & NIMP;
+LAYER PGATE = GATE & PIMP;
+LAYER HVTGATE = GATE & HVTIMP;
+LAYER LVTGATE = GATE & LVTIMP;
+LAYER DIFFGATE = GATE & ACTIVE;
+LAYER POLYGATE = GATE ! ACTIVE;
+LAYER CAPMETAL = CAP & (M1 | M2 | M3 | M4 | M5);
+LAYER RESMETAL = RES & (M1 | M2 | M3 | M4 | M5);
+LAYER ALLMETAL = M1 | M2 | M3 | M4 | M5 | M6 | M7 | M8 | M9 | M10;
+LAYER ALLVIA = V1 | V2 | V3 | V4 | V5 | V6 | V7 | V8 | V9;
+LAYER LOWERMET = M1 | M2 | M3 | M4 | M5;
+LAYER UPPERMET = M6 | M7 | M8 | M9 | M10;
+LAYER COREAREA = PRBOUND ! PAD;
+
+// DRC Rules
+// NWELL_WIDTH: N-Well minimum width
+rule nwell_width {
+    check_rule = width(NWELL) < 0.2;
+    error_message = "N-Well minimum width";
+}
+
+// NWELL_SPACE: N-Well minimum spacing
+rule nwell_space {
+    check_rule = space(NWELL) < 0.46;
+    error_message = "N-Well minimum spacing";
+}
+
+// NWELL_PWELL_SPACE: N-Well to P-Well spacing
+rule nwell_pwell_space {
+    check_rule = space(NWELL, PWELL) < 0.0;
+    error_message = "N-Well to P-Well spacing";
+}
+
+// DNW_WIDTH: Deep N-Well minimum width
+rule dnw_width {
+    check_rule = width(DNW) < 3.0;
+    error_message = "Deep N-Well minimum width";
+}
+
+// DNW_SPACE: Deep N-Well minimum spacing
+rule dnw_space {
+    check_rule = space(DNW) < 6.0;
+    error_message = "Deep N-Well minimum spacing";
+}
+
+// DNW_NWELL_ENCL: Deep N-Well must enclose N-Well
+rule dnw_nwell_encl {
+    check_rule = enclosure(DNW, NWELL) >= 1.5;
+    error_message = "Deep N-Well must enclose N-Well";
+}
+
+// ACTIVE_WIDTH: Active area minimum width
+rule active_width {
+    check_rule = width(ACTIVE) < 0.05;
+    error_message = "Active area minimum width";
+}
+
+// ACTIVE_SPACE: Active area minimum spacing
+rule active_space {
+    check_rule = space(ACTIVE) < 0.08;
+    error_message = "Active area minimum spacing";
+}
+
+// ACTIVE_NWELL_ENCL: N+ Active must be enclosed by N-Well
+rule active_nwell_encl {
+    check_rule = enclosure(NWELL, NACT) >= 0.05;
+    error_message = "N+ Active must be enclosed by N-Well";
+}
+
+// ACTIVE_PWELL_ENCL: P+ Active must be enclosed by P-Well
+rule active_pwell_encl {
+    check_rule = enclosure(PWELL, PACT) >= 0.05;
+    error_message = "P+ Active must be enclosed by P-Well";
+}
+
+// ACTIVE_AREA_MIN: Active area minimum size
+rule active_area_min {
+    check_rule = area(ACTIVE) < 0.0025;
+    error_message = "Active area minimum size";
+}
+
+// ACTIVE_DENSITY: Active area density check
+rule active_density {
+    check_rule = density(ACTIVE, 50, 50) < 0.2;
+    error_message = "Active area density check";
+}
+
+// GATE_WIDTH: Gate minimum width
+rule gate_width {
+    check_rule = width(GATE) < 0.05;
+    error_message = "Gate minimum width";
+}
+
+// GATE_LENGTH: Gate minimum length
+rule gate_length {
+    check_rule = length(DIFFGATE) < 0.04;
+    error_message = "Gate minimum length";
+}
+
+// GATE_SPACE: Gate minimum spacing
+rule gate_space {
+    check_rule = space(GATE) < 0.08;
+    error_message = "Gate minimum spacing";
+}
+
+// GATE_ACTIVE_OVERHANG: Gate must overhang active
+rule gate_active_overhang {
+    check_rule = enclosure(GATE, ACTIVE) >= 0.02;
+    error_message = "Gate must overhang active";
+}
+
+// POLY_WIDTH: Poly minimum width
+rule poly_width {
+    check_rule = width(POLYGATE) < 0.05;
+    error_message = "Poly minimum width";
+}
+
+// POLY_SPACE: Poly minimum spacing
+rule poly_space {
+    check_rule = space(POLYGATE) < 0.08;
+    error_message = "Poly minimum spacing";
+}
+
+// POLY_ACTIVE_SPACE: Poly to Active spacing
+rule poly_active_space {
+    check_rule = space(POLYGATE, ACTIVE) < 0.04;
+    error_message = "Poly to Active spacing";
+}
+
+// NPLUS_WIDTH: N+ implant minimum width
+rule nplus_width {
+    check_rule = width(NPLUS) < 0.1;
+    error_message = "N+ implant minimum width";
+}
+
+// NPLUS_ENCL_NACT: N+ must enclose N+ Active
+rule nplus_encl_nact {
+    check_rule = enclosure(NPLUS, NACT) >= 0.03;
+    error_message = "N+ must enclose N+ Active";
+}
+
+// PPLUS_WIDTH: P+ implant minimum width
+rule pplus_width {
+    check_rule = width(PPLUS) < 0.1;
+    error_message = "P+ implant minimum width";
+}
+
+// PPLUS_ENCL_PACT: P+ must enclose P+ Active
+rule pplus_encl_pact {
+    check_rule = enclosure(PPLUS, PACT) >= 0.03;
+    error_message = "P+ must enclose P+ Active";
+}
+
+// HVTIMP_WIDTH: HVT implant minimum width
+rule hvtimp_width {
+    check_rule = width(HVTIMP) < 0.1;
+    error_message = "HVT implant minimum width";
+}
+
+// LVTIMP_WIDTH: LVT implant minimum width
+rule lvtimp_width {
+    check_rule = width(LVTIMP) < 0.1;
+    error_message = "LVT implant minimum width";
+}
+
+// HVTIMP_LVTIMP_SPACE: HVT to LVT implant spacing
+rule hvtimp_lvtimp_space {
+    check_rule = space(HVTIMP, LVTIMP) < 0.1;
+    error_message = "HVT to LVT implant spacing";
+}
+
+// CONT_SIZE: Contact minimum size
+rule cont_size {
+    check_rule = width(CONT) < 0.026;
+    error_message = "Contact minimum size";
+}
+
+// CONT_SPACE: Contact minimum spacing
+rule cont_space {
+    check_rule = space(CONT) < 0.03;
+    error_message = "Contact minimum spacing";
+}
+
+// CONT_ACTIVE_ENCL: Active must enclose Contact
+rule cont_active_encl {
+    check_rule = enclosure(ACTIVE, CONT) >= 0.005;
+    error_message = "Active must enclose Contact";
+}
+
+// CONT_GATE_ENCL: Gate must enclose Contact
+rule cont_gate_encl {
+    check_rule = enclosure(GATE, CONT) >= 0.01;
+    error_message = "Gate must enclose Contact";
+}
+
+// CONT_GATE_SPACE: Contact to Gate spacing
+rule cont_gate_space {
+    check_rule = space(CONT, GATE) < 0.04;
+    error_message = "Contact to Gate spacing";
+}
+
+// M1_WIDTH: Metal1 minimum width
+rule m1_width {
+    check_rule = width(M1) < 0.032;
+    error_message = "Metal1 minimum width";
+}
+
+// M1_SPACE: Metal1 minimum spacing
+rule m1_space {
+    check_rule = space(M1) < 0.032;
+    error_message = "Metal1 minimum spacing";
+}
+
+// M1_AREA_MIN: Metal1 minimum area
+rule m1_area_min {
+    check_rule = area(M1) < 0.001024;
+    error_message = "Metal1 minimum area";
+}
+
+// M1_CONT_ENCL: Metal1 must enclose Contact
+rule m1_cont_encl {
+    check_rule = enclosure(M1, CONT) >= 0.005;
+    error_message = "Metal1 must enclose Contact";
+}
+
+// M2_WIDTH: Metal2 minimum width
+rule m2_width {
+    check_rule = width(M2) < 0.04;
+    error_message = "Metal2 minimum width";
+}
+
+// M2_SPACE: Metal2 minimum spacing
+rule m2_space {
+    check_rule = space(M2) < 0.04;
+    error_message = "Metal2 minimum spacing";
+}
+
+// M2_V1_ENCL: Metal2 must enclose Via1
+rule m2_v1_encl {
+    check_rule = enclosure(M2, V1) >= 0.005;
+    error_message = "Metal2 must enclose Via1";
+}
+
+// V1_SIZE: Via1 minimum size
+rule v1_size {
+    check_rule = width(V1) < 0.026;
+    error_message = "Via1 minimum size";
+}
+
+// V1_SPACE: Via1 minimum spacing
+rule v1_space {
+    check_rule = space(V1) < 0.03;
+    error_message = "Via1 minimum spacing";
+}
+
+// V1_M1_ENCL: Metal1 must enclose Via1
+rule v1_m1_encl {
+    check_rule = enclosure(M1, V1) >= 0.005;
+    error_message = "Metal1 must enclose Via1";
+}
+
+// V2_SIZE: Via2 minimum size
+rule v2_size {
+    check_rule = width(V2) < 0.028;
+    error_message = "Via2 minimum size";
+}
+
+// V2_SPACE: Via2 minimum spacing
+rule v2_space {
+    check_rule = space(V2) < 0.032;
+    error_message = "Via2 minimum spacing";
+}
+
+// M8_WIDTH: Metal8 minimum width
+rule m8_width {
+    check_rule = width(M8) < 0.2;
+    error_message = "Metal8 minimum width";
+}
+
+// M8_SPACE: Metal8 minimum spacing
+rule m8_space {
+    check_rule = space(M8) < 0.2;
+    error_message = "Metal8 minimum spacing";
+}
+
+// M9_WIDTH: Metal9 minimum width
+rule m9_width {
+    check_rule = width(M9) < 0.4;
+    error_message = "Metal9 minimum width";
+}
+
+// M9_SPACE: Metal9 minimum spacing
+rule m9_space {
+    check_rule = space(M9) < 0.4;
+    error_message = "Metal9 minimum spacing";
+}
+
+// M10_WIDTH: Metal10 minimum width
+rule m10_width {
+    check_rule = width(M10) < 0.8;
+    error_message = "Metal10 minimum width";
+}
+
+// M10_SPACE: Metal10 minimum spacing
+rule m10_space {
+    check_rule = space(M10) < 0.8;
+    error_message = "Metal10 minimum spacing";
+}
+
+// M1_DENSITY: Metal1 density constraints
+rule m1_density {
+    check_rule = density(M1, 100, 100) < 0.2;
+    error_message = "Metal1 density constraints";
+}
+
+// M2_DENSITY: Metal2 density constraints
+rule m2_density {
+    check_rule = density(M2, 100, 100) < 0.2;
+    error_message = "Metal2 density constraints";
+}
+
+// ALLMETAL_DENSITY: Total metal density
+rule allmetal_density {
+    check_rule = density(ALLMETAL, 200, 200) > 0.6;
+    error_message = "Total metal density";
+}
+
+// CAP_WIDTH: Capacitor minimum width
+rule cap_width {
+    check_rule = width(CAP) < 0.1;
+    error_message = "Capacitor minimum width";
+}
+
+// CAP_SPACE: Capacitor minimum spacing
+rule cap_space {
+    check_rule = space(CAP) < 0.15;
+    error_message = "Capacitor minimum spacing";
+}
+
+// CAPMETAL_AREA: Capacitor metal minimum area
+rule capmetal_area {
+    check_rule = area(CAPMETAL) < 0.01;
+    error_message = "Capacitor metal minimum area";
+}
+
+// RES_WIDTH: Resistor minimum width
+rule res_width {
+    check_rule = width(RES) < 0.1;
+    error_message = "Resistor minimum width";
+}
+
+// RES_LENGTH: Resistor minimum length
+rule res_length {
+    check_rule = length(RES) < 0.5;
+    error_message = "Resistor minimum length";
+}
+
+// RESMETAL_CONT_ENCL: Resistor metal must enclose contacts
+rule resmetal_cont_encl {
+    check_rule = enclosure(RESMETAL, CONT) >= 0.05;
+    error_message = "Resistor metal must enclose contacts";
+}
+
+// ESD_WIDTH: ESD device minimum width
+rule esd_width {
+    check_rule = width(ESD) < 2.0;
+    error_message = "ESD device minimum width";
+}
+
+// ESD_PAD_SPACE: ESD to PAD spacing
+rule esd_pad_space {
+    check_rule = space(ESD, PAD) < 5.0;
+    error_message = "ESD to PAD spacing";
+}
+
+// M1_ANTENNA_RATIO: Metal1 antenna ratio
+rule m1_antenna_ratio {
+    check_rule = antenna_ratio(M1, GATE) <= 50.0;
+    error_message = "Metal1 antenna ratio";
+}
+
+// M2_ANTENNA_RATIO: Metal2 antenna ratio
+rule m2_antenna_ratio {
+    check_rule = antenna_ratio(M2, GATE) <= 100.0;
+    error_message = "Metal2 antenna ratio";
+}
+
+// UPPER_METAL_ANTENNA: Upper metal antenna check
+rule upper_metal_antenna {
+    check_rule = antenna_ratio(UPPERMET, GATE) <= 500.0;
+    error_message = "Upper metal antenna check";
+}
+
+// VARACTOR_SIZE: Varactor minimum size
+rule varactor_size {
+    check_rule = width(VARACTOR) < 1.0;
+    error_message = "Varactor minimum size";
+}
+
+// VARACTOR_SPACE: Varactor minimum spacing
+rule varactor_space {
+    check_rule = space(VARACTOR) < 2.0;
+    error_message = "Varactor minimum spacing";
+}
+
+// IND_WIDTH: Inductor minimum width
+rule ind_width {
+    check_rule = width(IND) < 2.0;
+    error_message = "Inductor minimum width";
+}
+
+// IND_SPACE: Inductor minimum spacing
+rule ind_space {
+    check_rule = space(IND) < 5.0;
+    error_message = "Inductor minimum spacing";
+}
+
+// SEAL_WIDTH: Seal ring minimum width
+rule seal_width {
+    check_rule = width(SEAL) < 10.0;
+    error_message = "Seal ring minimum width";
+}
+
+// SEAL_CORE_SPACE: Seal ring to core spacing
+rule seal_core_space {
+    check_rule = space(SEAL, COREAREA) < 10.0;
+    error_message = "Seal ring to core spacing";
+}
+
+// TEXT_SIZE: Text minimum size
+rule text_size {
+    check_rule = width(TEXT) < 1.0;
+    error_message = "Text minimum size";
+}
+
+// BJTDUMMY_SIZE: BJT dummy minimum size
+rule bjtdummy_size {
+    check_rule = width(BJTDUMMY) < 0.5;
+    error_message = "BJT dummy minimum size";
+}
+
+// FRAME_WIDTH: Frame minimum width
+rule frame_width {
+    check_rule = width(FRAME) < 5.0;
+    error_message = "Frame minimum width";
+}
+
+// PRBOUND_ENCL_CORE: PR boundary must enclose all core layers
+rule prbound_encl_core {
+    check_rule = enclosure(PRBOUND, ALLMETAL) >= 2.0;
+    error_message = "PR boundary must enclose all core layers";
+}
+
+// GATE_PITCH_CHECK: Gate pitch regularity check
+rule gate_pitch_check {
+    check_rule = width(GATE) < 0.096;
+    error_message = "Gate pitch regularity check";
+}
+
+// METAL_SLOT_CHECK: Metal slotting requirement
+rule metal_slot_check {
+    check_rule = pattern_check(M1, rectangle);
+    error_message = "Metal slotting requirement";
+}
+
+// M1_COLOR_SPACE: Metal1 same color spacing
+rule m1_color_space {
+    check_rule = space_same_mask(M1) < 0.064;
+    error_message = "Metal1 same color spacing";
+}
+
+// M2_COLOR_SPACE: Metal2 same color spacing
+rule m2_color_space {
+    check_rule = space_same_mask(M2) < 0.08;
+    error_message = "Metal2 same color spacing";
+}
+
