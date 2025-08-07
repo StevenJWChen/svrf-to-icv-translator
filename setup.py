@@ -19,7 +19,7 @@ if requirements_file.exists():
 
 setup(
     name="svrf-to-icv-translator",
-    version="1.0.0",
+    version="1.0.1",
     description="Comprehensive Python toolkit for translating Calibre SVRF design rule files to Synopsys IC Validator (ICV) format",
     long_description=long_description,
     long_description_content_type="text/markdown",
